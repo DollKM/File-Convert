@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -8,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     QSettings set("default");
     ui->lineEdit->setText(set.value("inpath").toString());
+    ui->lineEdit_2->setText(set.value("outpath").toString());
 }
 
 MainWindow::~MainWindow()
@@ -15,15 +17,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_checkBox_clicked()
-{
-    ui->lineEdit->setText("");
-}
-
 void MainWindow::on_pushButton_clicked()
 {
     QString path;
-    if(ui->checkBox->isChecked())
+    if(ui->radioButton->isChecked())
     {
         path = QFileDialog::getExistingDirectory(this,"",ui->lineEdit->text());
     }
@@ -44,7 +41,8 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     QFileInfo info(ui->lineEdit->text());
-    copyDirectoryFiles(info.filePath(),info.absolutePath()+"/output",true);
+    QFileInfo info2(ui->lineEdit_2->text());
+    copyDirectoryFiles(info.filePath(),info2.filePath(),true);
     QMessageBox msg(QMessageBox::Warning,"Finish","convert encode finished!");
     msg.exec();
 }
@@ -87,21 +85,21 @@ bool MainWindow::copyDirectoryFiles(const QString &fromDir, const QString &toDir
 
 bool MainWindow::convertFile(const QString& src,const QString& dst)
 {
-    QFile srcFile,dstFile;  
-    QTextStream in,out; 
+    QFile srcFile;  
+    QTextStream in; 
     srcFile.setFileName(src);  
-    srcFile.open(QFile::ReadWrite);  
-    in.setDevice(&srcFile);
-    in.setCodec(ui->comboBox->currentText().toStdString().c_str());  
-    QString tmpstr = in.readAll();  
+    srcFile.open(QFile::ReadWrite);
+    in.setDevice(&srcFile);  
+    QString tmpstr = in.readAll();
+    srcFile.close();  
     
-    
+    QFile dstFile;
+    QTextStream out;
     dstFile.setFileName(dst);  
     dstFile.open(QFile::ReadWrite |QFile::Truncate);  
     out.setDevice(&dstFile);  
     out.setCodec(ui->comboBox_2->currentText().toStdString().c_str());  
     out<<tmpstr;  
-    srcFile.close();  
     dstFile.close();
     return true;
 }
@@ -118,3 +116,34 @@ bool MainWindow::convertFile(const QString& src,const QString& dst)
 //    dir.mkdir(info.absolutePath()+"/output");
     
 //}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QString path;
+    if(ui->radioButton->isChecked())
+    {
+        path = QFileDialog::getExistingDirectory(this,"",ui->lineEdit_2->text());
+    }
+    else
+    {
+        path = QFileDialog::getOpenFileName(this,"",ui->lineEdit_2->text());
+    }
+    if(path != "")
+    {
+        ui->lineEdit_2->setText(path);
+        QSettings set("default");
+        set.setValue("outpath",path);
+    }
+}
+
+void MainWindow::on_radioButton_2_clicked()
+{
+    ui->lineEdit->setText("");
+    ui->lineEdit_2->setText("");
+}
+
+void MainWindow::on_radioButton_clicked()
+{
+    ui->lineEdit->setText("");
+    ui->lineEdit_2->setText("");
+}

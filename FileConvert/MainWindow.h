@@ -7,6 +7,12 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QMessageBox>
+#include <string>
+#include <QTextCodec>
+
+using namespace std;
+
+#define null NULL
 
 namespace Ui {
 class MainWindow;
@@ -23,14 +29,21 @@ public:
     bool copyDirectoryFiles(const QString &fromDir, const QString &toDir, bool coverFileIfExis);
     bool convertFile(const QString& src,const QString& dst);
 private slots:
-    void on_checkBox_clicked();
     
     void on_pushButton_clicked();
     
     void on_pushButton_2_clicked();
     
+    void on_pushButton_3_clicked();
+    
+    void on_radioButton_2_clicked();
+    
+    void on_radioButton_clicked();
+    
 private:
     Ui::MainWindow *ui;
+    QString inputPath;
+    QString outputPath;
 };
 
 #endif // MAINWINDOW_H
